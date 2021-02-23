@@ -16,7 +16,7 @@ The method takes two parameters:
 ## Results
 Tables below show the comparison between network pruning results with based on different pruning methods. 
 
-ResNet56 on Cifar-10
+ResNet50 on ImageCLEF2016
 
 |     Method     | Compression Rate (%) | Accuracy ↓ (percentage points) |
 |:--------------:|:-----:|:----------------:|
