@@ -18,7 +18,7 @@ Tables below show the comparison between network pruning results with based on d
 
 ResNet50 on ImageCLEF2016
 
-|     Method     | Compression Rate (%) | Accuracy ↓ (percentage points) |
+|     Method     | Compression Rate (%) | Accuracy ↓ (%) |
 |:--------------:|:-----:|:----------------:|
 | Baseline (Finetuning) |  0 |       91.03       |
 | Prune (norm of weight)| 40% |  90.4       |
@@ -26,7 +26,7 @@ ResNet50 on ImageCLEF2016
 
 ResNet34 on ImageCLEF2016
 
-|     Method     | Compression Rate (%) | Accuracy ↓ (percentage points) |
+|     Method     | Compression Rate (%) | Accuracy ↓ (%) |
 |:--------------:|:-----:|:----------------:|
 | Baseline (Finetuning) |  0 |       90.3       |
 | Prune (norm of weight)| 40% |  89.8       |
@@ -34,7 +34,7 @@ ResNet34 on ImageCLEF2016
 
 ResNet50 on ImageCLEF2016
 
-|     Method     | Accuracy ↓ (percentage points) |
+|     Method     | Accuracy ↓ (%) |
 |:--------------:|:----------------:|
 | Train from scratch |  77.9    |
 | Finetuning)| 85.8  |
