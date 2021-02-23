@@ -24,14 +24,6 @@ ResNet50 on ImageCLEF2016
 | Prune (norm of weight)| 40% |  90.4       |
 | Prune (norm of weight) |   30% | 90.2 |
 
-ResNet34 on ImageCLEF2016
-
-|     Method     | Compression Rate (%) | Accuracy ↓ (%) |
-|:--------------:|:-----:|:----------------:|
-| Baseline (Finetuning) |  0 |       90.3       |
-| Prune (norm of weight)| 40% |  89.8       |
-| Prune (norm of weight) |   30% | 89.2 |
-
 ResNet50 on ImageCLEF2016
 
 |     Method     | Accuracy ↓ (%) |
@@ -40,4 +32,9 @@ ResNet50 on ImageCLEF2016
 | Finetuning)| 85.8  |
 | DSD |  86.2 |
 | IST  |  86.8 |
+
+Figures below show that weight distribution change in IST method. The first column indicate that the weight distribution from finetuning follows the normal distribution. The distribution in the second column of indicates that unimportant parameters  was removed. The third column indicate taht the removed weights are recovered. 
+![image](https://github.com/FredericChai/Deep_pruning_medical_image/blob/main/Result/Parameters%20distribution.png)
+
+
 
