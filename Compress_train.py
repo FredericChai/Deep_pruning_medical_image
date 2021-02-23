@@ -131,47 +131,6 @@ def compress_train(trainloader,model,temp_NN,criterion,optimizer,epoch,use_cuda)
             pbar.update(1)
     return (losses.avg, top1.avg)
 
-def compress_train_v2(trainloader,model,temp_NN,criterion,optimizer,epoch,use_cuda):
-    #train mode
-    model.train()
-    #metrics of the model
-    # batch_time = AverageMeter()
-    # data_time = AverageMeter()
-    losses = AverageMeter()
-    top1 = AverageMeter()
-    top5 = AverageMeter()
-    end = time.time()
-    with tqdm(total = len(trainloader)) as pbar:
-        for batch_idx, (inputs, targets) in enumerate(trainloader):
-            # measure data loading time
-            if use_cuda:
-                inputs, targets = inputs.cuda(), targets.cuda()
-            inputs, targets = torch.autograd.Variable(inputs), torch.autograd.Variable(targets)
-
-            # compute output
-            outputs = model(inputs)
-            loss = criterion(outputs, targets)
-            # measure accuracy and record loss
-            prec1, prec5 = accuracy(outputs.data, targets.data, topk=(1, 5))
-            losses.update(loss.item(), inputs.size(0))
-            top1.update(prec1.item(), inputs.size(0))
-            top5.update(prec5.item(), inputs.size(0))
-            # compute gradient and do SGD step
-            optimizer.zero_grad()
-            loss.backward()
-            # get rid of grad
-
-            for name, p in model.named_parameters():
-                    tensor = p.data.cpu().numpy() # the tensor of each layer
-                    grad_tensor = p.grad.data.cpu().numpy()
-                    grad_tensor = np.where(tensor==0, 0, grad_tensor)
-                    p.grad.data = torch.from_numpy(grad_tensor).to(device)
-
-            optimizer.step()
-            pbar.set_description('loss: %.4f top1: %.4f' % (loss.view(-1).data.tolist()[0],top1.avg))
-            pbar.update(1)
-    return (losses.avg, top1.avg)
-
 def main():
     if not args.sparse_ratio is None:
         #load the data
