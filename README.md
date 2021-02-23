@@ -33,8 +33,11 @@ ResNet50 on ImageCLEF2016
 | DSD |  86.2 |
 | IST  |  86.8 |
 
-Figures below show that weight distribution change in IST method. The first column indicate that the weight distribution from finetuning follows the normal distribution. The distribution in the second column of indicates that unimportant parameters  was removed. The third column indicate taht the removed weights are recovered. 
+Figure below show that weight distribution change in IST method. The first column indicate that the weight distribution from finetuning follows the normal distribution. The distribution in the second column of indicates that unimportant parameters  was removed. The third column indicate taht the removed weights are recovered. 
 ![image](https://github.com/FredericChai/Deep_pruning_medical_image/blob/main/Result/Parameters%20distribution.png)
+
+Following figure shows that the performance will be improved when number of iterations was increased.
+![image](https://github.com/FredericChai/Deep_pruning_medical_image/blob/main/Result/Obeserve%20Performance%20improvement.png)
 
 
 
