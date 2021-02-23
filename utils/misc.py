@@ -67,7 +67,7 @@ def prune(load_path,sparse_ratio,arch):
                 state_dict[k] = torch.where(torch.abs(sparse_tensor)>threshold,sparse_tensor,mask)
     if arch.startswith('resnet'):
         for k in state_dict:
-            if re.match(r'module.layer+\d+.+\d+.conv+\d+.weight',k) :  # The first layer is not the form of module.layer
+            if re.match(r'module.layer+\d+.+\d+.conv+\d+.weight',k):  # The first layer is not the form of module.layer
                 #compute the threshold
                 one_dim_tensor = torch.abs(state_dict[k].reshape(-1,)) 
                 threshold_index = int(sparse_ratio*len(one_dim_tensor))
@@ -79,28 +79,41 @@ def prune(load_path,sparse_ratio,arch):
                 state_dict[k] = torch.where(torch.abs(sparse_tensor)>threshold,sparse_tensor,mask)
     return state_dict
 
-def prune_v2(load_path,sparse_ratio,arch):
-    #randomly zooming the feature
-    print('random zooming the sparse_tensor')
-    checkpoint = torch.load(load_path)
-    state_dict = checkpoint['state_dict']
+def get_threshold(current_checkpoint,sparse_ratio,arch):
+    threshold_list = {}
+    if arch.startswith('vgg16'):    
+        for layer in current_checkpoint:
+            if layer.endswith('weight'):
+                #compute the threshold
+                one_dim_tensor = torch.abs(current_checkpoint[layer].reshape(-1,)) 
+                threshold_index = int(sparse_ratio*len(one_dim_tensor))
+                sorted_tensor,_ = one_dim_tensor.sort(0,descending = True)
+                threshold =  sorted_tensor[threshold_index].item()
+                #use dictionary to store threshold
+                threshold_list[layer] = threshold
+    return threshold_list
+
+def dsd_prune(current_checkpoint,sparse_ratio,arch,threshold_list):
+    state_dict = current_checkpoint
     
     if arch.startswith('vgg16'):
         for k in state_dict:
-            if not k.startswith('module.features.0') and k.endswith('weight'):
+            for j in threshold_list:
+                if k==j:
+                    threshold = threshold_list[k]
                 #compute the threshold
-                one_dim_tensor = torch.abs(state_dict[k].reshape(-1,)) 
-                threshold_index = int(sparse_ratio*len(one_dim_tensor))
-                sorted_tensor,_ = one_dim_tensor.sort(0,descending = True)
-                threshold =  sorted_tensor[threshold_index].item()
+                # one_dim_tensor = torch.abs(state_dict[k].reshape(-1,)) 
+                # threshold_index = int(sparse_ratio*len(one_dim_tensor))
+                # sorted_tensor,_ = one_dim_tensor.sort(0,descending = True)
+                # threshold =  sorted_tensor[threshold_index].item()
                 #apply threshold to layer
-                sparse_tensor = state_dict[k]
-          
-                mask = torch.randn(sparse_tensor.shape).cuda()
-                state_dict[k] = torch.where(torch.abs(sparse_tensor)>threshold,sparse_tensor,mask)
-    if arch.startswith('resnet'):
+                    sparse_tensor = state_dict[k]                         
+                    mask = torch.zeros(sparse_tensor.shape).cuda()
+                    state_dict[k] = torch.where(torch.abs(sparse_tensor)>threshold,sparse_tensor,mask)
+                    # print('find the pruned key',k)
+    if arch.startswith('resnet101'):
         for k in state_dict:
-            if k.endswith('weight') :  # The first layer is not the form of module.layer
+            if re.match(r'module.layer+\d+.+\d+.conv+\d+.weight',k):  # The first layer is not the form of module.layer
                 #compute the threshold
                 one_dim_tensor = torch.abs(state_dict[k].reshape(-1,)) 
                 threshold_index = int(sparse_ratio*len(one_dim_tensor))
@@ -108,7 +121,7 @@ def prune_v2(load_path,sparse_ratio,arch):
                 threshold =  sorted_tensor[threshold_index].item()
                 #apply threshold to layer
                 sparse_tensor = state_dict[k]
-                mask = torch.randn(sparse_tensor.shape).cuda()
+                mask = torch.zeros(sparse_tensor.shape).cuda()
                 state_dict[k] = torch.where(torch.abs(sparse_tensor)>threshold,sparse_tensor,mask)
     return state_dict
 
@@ -159,7 +172,6 @@ def filter_prune(load_path,sparse_ratio,arch):
 def Reduce_prune(load_path,sparse_ratio,arch):
     """prune the model by zooming out the weight
     """
-    c = 0.1
     checkpoint = torch.load(load_path)
     state_dict = checkpoint['state_dict']
     # optimizer  =checkpoint['optimizer']
@@ -190,31 +202,3 @@ def Reduce_prune(load_path,sparse_ratio,arch):
     
     return state_dict
 
-# def get_dynamic_ratio(sparse_ratio,performance):
-#     #dynamically control the pruning ratio for each pruning iterations
-#     # we will use sigmoid function to control the pruning ratio
-#     x = performance
-#     return 1 / (1 + math.exp(9x-7.5))
-
-def load_cifar10():
-
-    transform_train = transforms.Compose([
-    transforms.RandomCrop(32, padding=4),
-    transforms.RandomHorizontalFlip(),
-    transforms.ToTensor(),
-    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
-    ])
-
-    transform_test = transforms.Compose([
-    transforms.ToTensor(),
-    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
-    ])
-
-    trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform_train)
-    trainloader = torch.utils.data.DataLoader(trainset, batch_size=128, shuffle=True, num_workers=2)
-
-    testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform_test)
-    testloader = torch.utils.data.DataLoader(testset, batch_size=32, shuffle=False, num_workers=2)
-
-    className = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
-    return trainloader,testloader,className
