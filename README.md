@@ -34,10 +34,10 @@ ResNet34 on ImageCLEF2016
 
 ResNet50 on ImageCLEF2016
 
-|     Method     |  | Accuracy ↓ (percentage points) |
+|     Method     | Accuracy ↓ (percentage points) |
 |:--------------:|:----------------:|
-| Train from scratch |  77.9       |
-| Finetuning)| 40% |  85.8       |
+| Train from scratch |  77.9    |
+| Finetuning)| 85.8  |
 | DSD |  86.2 |
 | IST  |  86.8 |
 
