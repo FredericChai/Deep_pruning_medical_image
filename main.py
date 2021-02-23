@@ -22,9 +22,9 @@ from sklearn.metrics import recall_score,accuracy_score
 from model import VGG 
 from utils import *
 
-parser = argparse.ArgumentParser(description = 'Pytorch VGG on PET-CT image')
+parser = argparse.ArgumentParser(description = 'PET-CT image')
 #path of dataset
-parser.add_argument('--dataset',default = '/mnt/HDD1/Frederic/Deep_compress/',type = str,help = 'path of dataset')
+parser.add_argument('--dataset',default = '',type = str,help = 'path of dataset')
 #configuration 
 parser.add_argument('--epochs',default = 100,type=int,help='epochs for each sparse model to run')
 parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
@@ -179,14 +179,11 @@ def main():
         for ite in range(args.sparse_epoch):
             best_acc = 0
             start_epoch = 0
-            #sparse_model_path: /mnt/HDD2/Frederic/ensemble_baseline/pruned_checkpoint/0.4-vgg16-epoch...
-            #result_path: /mnt/HDD1/Frederic/ensemble_baseline/pruned_checkpoint/0.4-vgg16-epoch.../sparse_ite_0
             sparse_model_path = args.dataset+'Observe_LaterFix_pruned_checkpoint/'+str(args.sparse_ratio)+'-'+\
                                 args.arch+'-epoch'+str(args.epochs)
             result_path = args.dataset+'Observe_LaterFix_pruned_checkpoint/'+str(args.sparse_ratio)+'-'+\
                                 args.arch+'-epoch'+str(args.epochs)+'/sparse_ite_'+str(ite)+args.prune_version
             make_path(result_path) 
-            #sparse_checkpoint_path: /mnt/HDD1/Frederic/vgg_sparse/pruned_checkpoint/0.4-vgg16/sparse_ite_0/sparse_checkpoint.pth.tar
             sparse_checkpoint_path =  os.path.join(result_path,'sparse_checkpoint.pth.tar')
             if ite ==0: #prune the checkpoint from trained model
                 source_checkpoint = args.source_checkpoint
@@ -231,7 +228,6 @@ def main():
             # Train and validate model
             for epoch in range(start_epoch,args.epochs): 
                 # adjust_learning_rate(optimizer,epoch)
-                # adjust_learning_rate(optimizer,epoch,args.lr,args.schedule,args.gamma)
                 print('\nSparse iteration: [%d | %d]Epoch: [%d | %d] Best acc: %f' % (ite+1,args.sparse_epoch,epoch + 1, args.epochs, best_acc))
 
                 train_loss, train_acc = compress_train(dataloaders['train'], NN,temp_NN, criterion, optimizer, epoch,use_cuda)
@@ -281,15 +277,13 @@ def main():
     else: 
         # if not use sparse_ratio, turn to evaluate mode or finetune mode
         if not args.evaluate_path is None:
-            # if use evaluate path and use probablity evaluate mode. Output probablity evalutaion result           
+    
             write_probablity_integrate_result()
             return 
 
 def write_probablity_integrate_result():
       #path to store the result
-    one_target  = np.loadtxt('/mnt/HDD1/Frederic/Deep_compress/pruned_checkpoint/0.4-resnet50-epoch150/sparse_ite_0'+args.prune_version+'/target.txt',dtype = int)
-    #use k to store the index of final result
-   #use k to store the index of final result
+    one_target  = np.loadtxt('./Pruned_result/0.4-resnet50-epoch150/sparse_ite_0'+args.prune_version+'/target.txt',dtype = int)
     k=0
     #the final result is used to store the final result
     final_result = np.zeros((len(one_target),7),dtype = float) 
@@ -297,11 +291,9 @@ def write_probablity_integrate_result():
     make_path(result_path)
     writer =  open(result_path+'/Integrate_probability_result_WeightVote.txt','w')
     for i in range(args.sparse_epoch):
-        #/mnt/HDD2/Frederic/ensemble_baseline/pruned_checkpoint/0.4-resnet101-epoch100/Result/1
         
         print('begin to evaluate, create path for store result:')
         
-        #/mnt/HDD2/Frederic/ensemble_baseline/pruned_checkpoint/0.4-resnet101-epoch100/sparse_ite_0
         source = args.source_checkpoint+'/sparse_ite_'+str(i)+args.prune_version
         #load data
         dataloaders,testDataloaders,dataset_sizes,class_names,numOfClasses = load_data(args.dataset+'Data-Network-Compression-ISIC18')
@@ -478,7 +470,6 @@ def load_data(path):
 }
 
     data_dir = path
-    # testData_dir = '/mnt/HDD1/Frederic/ensemble_baseline/TestImage/'
 
     image_datasets = {
             x : datasets.ImageFolder(os.path.join(data_dir,x),
