@@ -1,0 +1,22 @@
+cd /mnt/HDD1/Frederic/vgg_1
+
+"""Sparse Trainning process"""
+python  main.py  --arch vgg16_pretrained --epoch 500 --gpu_id 1
+
+python main.py --arch resnet18_pretrained --schedule 150 --epoch 300 --gpu_id 0
+
+python main.py --arch resnet50_pretrained --epoch 300 --gpu_id 1
+
+python main.py --arch resnet34_pretrained --schedule 150 --epoch 300 --gpu_id 1
+
+python main.py --arch resnet152_pretrained --schedule 200 --epoch 300 --gpu_id 1
+
+"""prune the weight"""
+
+
+python main.py --sparse_ratio 0.4 --sparse_epoch 3 --gpu_id 1 --arch resnet50 --source_checkpoint /mnt/HDD1/Frederic/Deep_compress/checkpoint/resnet50_pretrained-checkpoint-epoch200/model_best.pth.tar --epoch 400 
+
+
+
+
+
