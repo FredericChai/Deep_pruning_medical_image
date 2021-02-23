@@ -1,7 +1,27 @@
 # Deep_pruning_medical_image
+This repository provides the implementation of the network pruning method proposed. The model (e.g. ResNet) will firstly be pretrained on ImageNet and then finetuned on medical datasets(e.g. ImageCLEF2016). Then we will prune CNN neurons and finetune the model agian. It also implement dense-sparse-dense training method from paper [Dsd: Dense-sparse-dense training for deep neural networks]
 
-  
-This file is to create the baseline of ensembling the model. Different from previous one, it uses train, validate files to find the best parameters of the model and then use test to evaluate the model.
+## Requirements
+- [Scikit-learn](http://scikit-learn.org/stable/)
+- [Pytorch](https://pytorch.org/) (Recommended version 9.2)
+- [Python 3](https://www.python.org/)
 
-It will become the baseline of the pruned model which will also use the valid the test image.
+## Quick Start
+[main.py](main.py) and receipes provides an example of our pruning approach. In this example, we prune a  sophistcated convolutional neural network (ResNet50). 
+
+The method takes two parameters:
+1. Number of pruning iterations 
+2. Percentage of neurons to be removed in each iteration 
+
+## Results
+Tables below show the comparison between network pruning results with based on different pruning methods. 
+
+ResNet56 on Cifar-10
+
+|     Method     | Compression Rate (%) | Accuracy ↓ (percentage points) |
+|:--------------:|:-----:|:----------------:|
+| Baseline (Finetuning) |  0 |       91.03       |
+| Prune (norm of weight)| 40% |  90.4       |
+| Prune (norm of weight) |   30% | 90.2 |
+
 
